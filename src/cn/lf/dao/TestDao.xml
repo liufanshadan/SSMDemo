@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.lf.dao.TestDao">
+
+ <resultMap id="BaseResultMap" type="cn.lf.pojo.TbContent" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="category_id" property="categoryId" jdbcType="BIGINT" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="sub_title" property="subTitle" jdbcType="VARCHAR" />
+    <result column="title_desc" property="titleDesc" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="pic" property="pic" jdbcType="VARCHAR" />
+    <result column="pic2" property="pic2" jdbcType="VARCHAR" />
+    <result column="created" property="created" jdbcType="TIMESTAMP" />
+    <result column="updated" property="updated" jdbcType="TIMESTAMP" />
+    
+    <association property="contentCategory" javaType="cn.lf.pojo.TbContentCategory">
+		<!-- id:声明主键，表示user_id是关联查询对象的唯一标识-->
+		<id property="id" column="id" />
+		<result column="name" property="name" />
+		</association>
+  </resultMap>
+  
+  <resultMap id="ResultMap" type="cn.lf.pojo.TbContentCategory" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="parent_id" property="parentId" jdbcType="BIGINT" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="sort_order" property="sortOrder" jdbcType="INTEGER" />
+    <result column="is_parent" property="isParent" jdbcType="BIT" />
+    <result column="created" property="created" jdbcType="TIMESTAMP" />
+    <result column="updated" property="updated" jdbcType="TIMESTAMP" />
+    
+    <collection property="list" javaType="java.util.List" ofType="cn.lf.pojo.TbContent">
+    <id column="con_id" property="id" jdbcType="BIGINT" />
+    <result column="category_id" property="categoryId" jdbcType="BIGINT" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="sub_title" property="subTitle" jdbcType="VARCHAR" />
+    <result column="title_desc" property="titleDesc" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="pic" property="pic" jdbcType="VARCHAR" />
+    <result column="pic2" property="pic2" jdbcType="VARCHAR" />
+    <result column="created" property="created" jdbcType="TIMESTAMP" />
+    <result column="updated" property="updated" jdbcType="TIMESTAMP" />
+    
+    </collection>
+  </resultMap>
+	<!-- 查询 -->
+	<select id="test"  parameterType="int" resultType="cn.lf.pojo.Tb_Item">
+		select * from tb_item  t where t.price <![CDATA[<=]]> 50000 
+	</select>
+	<select id="mapInput"  parameterType="java.util.Map" resultMap="BaseResultMap">
+		select * from tb_content  t where t.category_id = #{category_id} and 
+		<foreach collection="id" item="id" open="id IN (" close=")"
+			separator=",">
+			#{id}
+		</foreach>
+	</select>
+	<select id="dulpSelect" parameterType="int" resultMap="BaseResultMap">
+		select * from tb_content  con left join tb_content_category  cat  on con.category_id = cat.id
+		where con.id = #{id} 
+	</select>
+	
+	<select id="OneToManey" parameterType="int" resultMap="ResultMap">
+		select cat.id,cat.name,cat.parent_id,con.id con_id,con.title,con.category_id from  tb_content_category  cat left join tb_content  con  on con.category_id = cat.id
+		where cat.id = #{id} 
+	</select>
+</mapper>
+
